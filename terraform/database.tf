@@ -23,7 +23,7 @@ resource "aws_db_instance" "strapi" {
   identifier              = "postgres-database-iden"
   engine                  = "postgres"
   engine_version          = "15"
-  instance_class          = "db.t3.small"
+  instance_class          = "db.t3.large"
   allocated_storage       = 20
 
   db_name                 = "strapi"
