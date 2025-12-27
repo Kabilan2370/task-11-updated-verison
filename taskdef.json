@@ -28,7 +28,7 @@
         { "name": "DATABASE_SSL", "value": "true" },
         { "name": "DATABASE_SSL_REJECT_UNAUTHORIZED", "value": "false" },
 
-        // Optional: Control pool sizes from environment
+    
         { "name": "DATABASE_POOL_MIN", "value": "0" },
         { "name": "DATABASE_POOL_MAX", "value": "5" },
         { "name": "DATABASE_CONNECTION_TIMEOUT", "value": "60000" },
