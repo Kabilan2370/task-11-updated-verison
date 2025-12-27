@@ -1,4 +1,3 @@
-
 {
   "family": "docker-strapi-family",
   "networkMode": "awsvpc",
@@ -10,13 +9,10 @@
   "containerDefinitions": [
     {
       "name": "strapi-web",
-      "image": "<IMAGE_URI>",
+      "image": "<IMAGE_URI>",  
       "essential": true,
       "portMappings": [
-        {
-          "containerPort": 1337,
-          "protocol": "tcp"
-        }
+        { "containerPort": 1337, "protocol": "tcp" }
       ],
       "environment": [
         { "name": "HOST", "value": "0.0.0.0" },
@@ -31,10 +27,15 @@
 
         { "name": "DATABASE_SSL", "value": "true" },
         { "name": "DATABASE_SSL_REJECT_UNAUTHORIZED", "value": "false" },
-  
+
+        // Optional: Control pool sizes from environment
+        { "name": "DATABASE_POOL_MIN", "value": "0" },
+        { "name": "DATABASE_POOL_MAX", "value": "5" },
+        { "name": "DATABASE_CONNECTION_TIMEOUT", "value": "60000" },
+
         { "name": "APP_KEYS", "value": "r9pQ7fC0y6nYvP1H0M8z2KZ+FZt9JqYpR8aM1s3EwQ4=,m3L2V7N+Kx0T9fQWJ5p8E4rZPZCq+S6A1yH0MdnYv8=,FZ+P9Jq3sM0yQ7r8aK6L1Tz4VnH2E5CwWmRZx=,xZ9E1r2V7p8C6Wq0mM5QJH3N4Y+LZsAFTk=" },
         { "name": "API_TOKEN_SALT", "value": "S8Z3xH0QJ7r2p9C6yF5M+K4TnE1A=" },
-        { "name":"ADMIN_JWT_SECRET", "value": "Z1x8K9yH3pQF7J0+E2C4rV6mN5A=" },
+        { "name": "ADMIN_JWT_SECRET", "value": "Z1x8K9yH3pQF7J0+E2C4rV6mN5A=" },
         { "name": "JWT_SECRET", "value": "H5N6M8JZ9QF0y+K7pE3x1rC4V2A=" }
       ],
       "logConfiguration": {
