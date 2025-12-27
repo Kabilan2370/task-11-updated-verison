@@ -45,9 +45,9 @@ export default ({ env }) => {
   pool: {
     min: 0, // 🔴 IMPORTANT for RDS
     max: 5, // 🔴 DO NOT increase
-    idleTimeoutMillis: 10000,
-    acquireTimeoutMillis: 30000,
-    reapIntervalMillis: 5000,
+    idleTimeoutMillis: 30000,
+    acquireTimeoutMillis: 60000,
+    reapIntervalMillis: 10000,
 
     // 🔴 Prevent reuse of dead RDS connections
     validate: (conn) => conn && !conn._ending,
