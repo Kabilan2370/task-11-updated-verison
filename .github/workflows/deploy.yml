@@ -1,0 +1,87 @@
+name: Deploy Strapi to ECS
+
+# on:
+#   push:
+#     branches: [ "main" ]
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPO: docker-strapi-ecr
+  ECS_CLUSTER: ecs-cluster-aws
+  CODEDEPLOY_APP: code-application-cd
+  CODEDEPLOY_DG: code-deploy-gn
+  CONTAINER_NAME: strapi-web
+  CONTAINER_PORT: 1337
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+    - name: Login to ECR
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build & Push Image
+      run: |
+        IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${GITHUB_SHA}
+        docker build -t $IMAGE_URI .
+        docker push $IMAGE_URI
+        echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+
+    - name: Render Task Definition
+      run: |
+        sed "s|<IMAGE_URI>|$IMAGE_URI|g" taskdef.json > taskdef-rendered.json
+
+    - name: Register ECS Task Definition
+      run: |
+        TASK_DEF_ARN=$(aws ecs register-task-definition \
+          --cli-input-json file://taskdef-rendered.json \
+          --query 'taskDefinition.taskDefinitionArn' \
+          --output text)
+
+        echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+        echo "Registered task definition: $TASK_DEF_ARN"
+
+    - name: Generate AppSpec
+      run: |
+          cat <<EOF > appspec.yaml
+          version: 1
+          Resources:
+            - TargetService:
+                Type: AWS::ECS::Service
+                Properties:
+                  TaskDefinition: ${TASK_DEF_ARN}
+                  LoadBalancerInfo:
+                    ContainerName: ${CONTAINER_NAME}
+                    ContainerPort: ${CONTAINER_PORT}
+          EOF
+
+
+    - name: Create CodeDeploy deployment
+      run: |
+        DEPLOYMENT_ID=$(aws deploy create-deployment \
+          --application-name $CODEDEPLOY_APP \
+          --deployment-group-name $CODEDEPLOY_DG \
+          --revision "$(jq -n \
+            --rawfile content appspec.yaml \
+            '{revisionType:"AppSpecContent", appSpecContent:{content:$content}}')" \
+          --query 'deploymentId' \
+          --output text)
+
+        echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
+        echo "Deployment started: $DEPLOYMENT_ID"
+
+    - name: Wait for Deployment
+      run: |
+        aws deploy wait deployment-successful --deployment-id $DEPLOYMENT_ID
