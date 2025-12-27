@@ -1,61 +1,127 @@
-# 🚀 Getting started with Strapi
+### GitHub Actions workflow to handle deployment
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
+### CI/CD Deployment Flow (GitHub Actions → AWS ECS via CodeDeploy)
 
-### `develop`
+#### This project uses GitHub Actions to build, push, and deploy a Dockerized application to AWS ECS using AWS CodeDeploy for blue/green deployments.
 
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
+2️⃣ Configure GitHub Secrets
 
-```
-npm run develop
-# or
-yarn develop
-```
+Add the following secrets in GitHub → Settings → Secrets → Actions:
 
-### `start`
+3️⃣ GitHub Actions Workflow Trigger
 
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
+Workflow runs automatically on:
 
-```
-npm run start
-# or
-yarn start
-```
+Push to main branch
 
-### `build`
+Example:
 
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
+on:
+  push:
+    branches: [ "main" ]
 
-```
-npm run build
-# or
-yarn build
-```
+4️⃣ Build Docker Image
 
-## ⚙️ Deployment
+Checkout source code
 
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
+Build Docker image locally in GitHub Actions
 
-```
-yarn strapi deploy
-```
+Tag the image using GitHub commit SHA
 
-## 📚 Learn more
+IMAGE_TAG = <git_commit_sha>
 
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
+5️⃣ Authenticate to Amazon ECR
 
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
+Login to Amazon ECR using AWS credentials
 
-## ✨ Community
+Authenticate Docker client
 
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
+6️⃣ Push Docker Image to ECR
 
----
+Push the image to Amazon ECR
 
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+7️⃣ Update ECS Task Definition Dynamically
+
+Fetch existing ECS task definition
+
+Replace the container image with the new ECR image URI
+
+Register a new task definition revision
+
+Capture the new Task Definition ARN
+
+8️⃣ Prepare CodeDeploy AppSpec File
+
+Generate appspec.yaml dynamically
+
+Reference:
+
+New task definition ARN
+
+ECS service name
+
+Load balancer container name & port
+
+
+9️⃣ Trigger AWS CodeDeploy Deployment
+
+Create a new deployment using:
+
+CodeDeploy application
+
+Deployment group
+
+AppSpec content
+
+CodeDeploy performs:
+
+Blue/Green traffic shifting
+
+Health checks
+
+Automatic rollback on failure (if enabled)
+
+🔟 Monitor Deployment Status (Optional)
+
+Poll CodeDeploy deployment status:
+
+InProgress
+
+Succeeded
+
+Failed
+
+Fail the GitHub Actions job if deployment fails
+
+🔁 Automatic Rollback (Optional)
+
+If deployment fails:
+
+CodeDeploy automatically rolls back to the last healthy task definition
+
+GitHub Actions marks the workflow as failed
+
+✅ Deployment Success
+
+On successful deployment:
+
+New Docker image is live on ECS
+
+Traffic is fully shifted to the new task revision
+
+Old task revision is terminated safely
+
+📌 Summary Flow
+Git Push
+  ↓
+GitHub Actions
+  ↓
+Build Docker Image
+  ↓
+Push to ECR (commit SHA tag)
+  ↓
+Register ECS Task Definition
+  ↓
+Create CodeDeploy Deployment
+  ↓
+Blue/Green Release
