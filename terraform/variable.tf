@@ -1,5 +1,5 @@
 variable "aws_region" {
-  default = "eu-north-1"
+  default = "ap-south-1"
 }
 
 variable "image_uri" {
