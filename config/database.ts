@@ -52,6 +52,7 @@ export default ({ env }) => {
     // 🔴 Prevent reuse of dead RDS connections
     validate: (conn) => conn && !conn._ending,
   },
+  debug: false,
 },
     sqlite: {
       connection: {
