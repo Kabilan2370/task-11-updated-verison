@@ -19,7 +19,7 @@
         { "name": "PORT", "value": "1337" },
 
         { "name": "DATABASE_CLIENT", "value": "postgres" },
-        { "name": "DATABASE_HOST", "value": "postgres-sql.cbowmc0uim96.ap-south-1.rds.amazonaws.com" },
+        { "name": "DATABASE_HOST", "value": "postgres-sql.clu8aaawcfq0.eu-north-1.rds.amazonaws.com" },
         { "name": "DATABASE_PORT", "value": "5432" },
         { "name": "DATABASE_NAME", "value": "strapi" },
         { "name": "DATABASE_USERNAME", "value": "strapi" },
@@ -42,7 +42,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/logs-store",
-          "awslogs-region": "ap-south-1",
+          "awslogs-region": "eu-north-1",
           "awslogs-stream-prefix": "ecs"
         }
       }
