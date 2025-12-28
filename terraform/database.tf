@@ -38,7 +38,7 @@ resource "aws_security_group" "strapi_sg2" {
     from_port      = 5432
     to_port        = 5432
     protocol       = "tcp"
-    security_groups    = [aws_security_group.alb.id]
+    security_groups    = [aws_security_group.strapi_sg.id]
   }
 
   egress {
@@ -77,7 +77,7 @@ resource "aws_db_instance" "strapi" {
   publicly_accessible     = true
   skip_final_snapshot     = true
 
-  vpc_security_group_ids  = [aws_security_group.strapi_sg2.id] 
+  vpc_security_group_ids  = [aws_security_group.strapi_sg2.id]
   parameter_group_name = aws_db_parameter_group.strapi_pg.name
 
 }
