@@ -44,7 +44,7 @@ export default ({ env }) => {
 
   pool: {
     min: 0, // 🔴 IMPORTANT for RDS
-    max: 5, // 🔴 DO NOT increase
+    max: 10, // 🔴 DO NOT increase
     idleTimeoutMillis: 30000,
     acquireTimeoutMillis: 60000,
     reapIntervalMillis: 10000,
