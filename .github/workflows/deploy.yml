@@ -1,12 +1,12 @@
 name: Deploy Strapi to ECS
 
-# on:
-#   push:
-#     branches: [ "main" ]
+on:
+  push:
+    branches: [ "main" ]
 
 env:
-  AWS_REGION: ap-south-1
-  ECR_REPO: docker-strapi-ecr
+  AWS_REGION: eu-north-1
+  ECR_REPO: docker-strapi
   ECS_CLUSTER: ecs-cluster-aws
   CODEDEPLOY_APP: code-application-cd
   CODEDEPLOY_DG: code-deploy-gn
