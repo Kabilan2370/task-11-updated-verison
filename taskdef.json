@@ -19,7 +19,7 @@
         { "name": "PORT", "value": "1337" },
 
         { "name": "DATABASE_CLIENT", "value": "postgres" },
-        { "name": "DATABASE_HOST", "value": "postgres-sql.clu8aaawcfq0.eu-north-1.rds.amazonaws.com" },
+        { "name": "DATABASE_HOST", "value": "postgres-sql.cbowmc0uim96.ap-south-1.rds.amazonaws.com" },
         { "name": "DATABASE_PORT", "value": "5432" },
         { "name": "DATABASE_NAME", "value": "strapi" },
         { "name": "DATABASE_USERNAME", "value": "strapi" },
